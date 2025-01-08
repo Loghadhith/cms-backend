@@ -2,10 +2,10 @@ package user
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/Loghadhith/cms/types"
+	"github.com/Loghadhith/cms/utils"
 )
 
 type Store struct {
@@ -30,77 +30,11 @@ func (s *Store) CreateUser(user types.User) error {
 }
 
 func (s *Store) GetUserByEmail(email string) (*types.User, error) {
-
-  stmt := "SELECT * FROM users WHERE"
-
-  if email != "" {
-    stmt += fmt.Sprintf(" email = '%v';", email)
-  }
-
-	rows, err := s.db.Query(stmt)
-	if err != nil {
-		return nil, err
-	}
-  defer rows.Close()
-
-	u := new(types.User)
-
-  defer rows.Close()
-
-	for rows.Next() {
-
-		u, err = scanRowsIntoUser(rows)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if u.ID == 0 {
-		return nil, fmt.Errorf("user not found")
-	}
-
-	return u, nil
+  u,r := utils.GetUserByEmail(s.db,email)
+  return u,r
 }
 
 func (s *Store) GetUserByID(id int) (*types.User, error) {
-	rows, err := s.db.Query("SELECT * FROM users WHERE id = $1", id)
-
-
-	if err != nil {
-		return nil, err
-	}
-
-	u := new(types.User)
-	for rows.Next() {
-		u, err = scanRowsIntoUser(rows)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if u.ID == 0 {
-		return nil, fmt.Errorf("user not found")
-	}
-
-	return u, nil
-}
-
-func scanRowsIntoUser(rows *sql.Rows) (*types.User, error) {
-	user := new(types.User)
-
-
-	err := rows.Scan(
-		&user.ID,
-		&user.Username,
-		&user.Email,
-		&user.Password,
-    &user.Pat,
-		&user.CreatedAt,
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+  u,r := utils.GetUserByID(s.db,id)
+  return u,r
 }

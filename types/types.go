@@ -12,16 +12,29 @@ type User struct {
 }
 
 type Post struct {
-	ID    int    `json:"id"`
-	CID   int    `json:"cid"`
-	Repo  string `json:"repo"`
-	Fname string `json:"fname"`
-	Media string `json:"media"`
+	ID        int       `json:"id"`
+	UID       int       `json:"uid"`
+	Repo      string    `json:"repo"`
+	Path      string    `json:"file"`
+	Type      string    `json:"ftype"`
+	Url       string    `json:"url"`
+	CreatedAt time.Time `json:"createdat"`
+	UpdatedAt time.Time `json:"updatedat"`
+}
+
+type ViewReturn struct {
+	File string `json:"path"`
+	Type string `json:"type"`
+}
+
+type ViewStore interface {
+	GetFilesInRepo(repo string, mail string) ([]ViewReturn,error)
 }
 
 type PostStore interface {
-	PostContentText(txt string) error
-	PostMedia() error
+	PostContent(post PostPayload) error
+	PostContentOnExistRepo(post PostPayload) error
+	GetPostedData(mail ReqBody) ([]string, error)
 }
 
 type UserStore interface {
@@ -30,11 +43,16 @@ type UserStore interface {
 	CreateUser(User) error
 }
 
+type ReqBody struct {
+	Email string `json:"email"`
+}
+
 type PostPayload struct {
-  Repo string `json:"repo"`
-  Path string `json:"file"`
-  Type string `json:"ftype"`
-  Data string `json:"data"`
+	Email string `json:"email"`
+	Repo  string `json:"repo"`
+	Path  string `json:"file"`
+	Type  string `json:"ftype"`
+	Data  string `json:"data"`
 }
 
 type LoginUserPayload struct {
